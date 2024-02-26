@@ -1,34 +1,27 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
-const hre = require("hardhat");
-const { ethers, BigNumber } = require("ethers");
+const hre = require("hardhat"); // THIS TIME IT`S NOT "es6", IT IS 'commonjs"
+const { ethers } = require("ethers");
 
 async function main() {
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-  const greeter = await hre.ethers.getContractAt("Greeter", contractAddress);
+    const contractAddress = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
+    const lock = await hre.ethers.getContractAt("Lock", contractAddress)
+    /* ALTERNATIVE WAY
+    const Lock = await ethers.getContractFactory("Lock");
+    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+    */
 
-  console.log("Initial greeting", await greeter.greet());
-
-  console.log("Setting greeting....");
-  const setTx = await greeter.setGreeting("Is this working??");
-
-  console.log("setTx sent!");
-
-  await setTx.wait();
-
-  console.log("setTx mined!");
-
-  console.log("New greeting!", await greeter.greet());
+/*
+    console.log(await lock.getGreeting());
+    console.log("Changing..");
+    const setTx = await lock.setGreeting("hey");
+    await setTx.wait();
+    console.log(await lock.getGreeting());
+*/
+    const withdrawTx = await lock.withdraw();
+    await withdrawTx.wait();
+    console.log("All TXs mined!");
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

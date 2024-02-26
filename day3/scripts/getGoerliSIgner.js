@@ -10,12 +10,11 @@ const hre = require("hardhat"); // THIS TIME IT`S NOT "es6", IT IS 'commonjs"
 const { ethers } = require("ethers");
 
 async function main() {
-    const localProviderUrl = "http://127.0.0.1:8545/";
-    const localProvider = new ethers.JsonRpcProvider(localProviderUrl);
-
-    const account0Address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-    const account0Balance = await localProvider.getBalance(account0Address);
-    console.log("account0Balance:", ethers.formatEther(account0Balance));
+    const signer = (await hre.ethers.getSigners())[0];
+    const signerAddr = signer.address;
+    const signerBalance = await signer.provider.getBalance(signerAddr);
+    
+    console.log("Balance:", ethers.formatEther(signerBalance));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

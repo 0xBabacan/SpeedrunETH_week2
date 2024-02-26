@@ -1,35 +1,36 @@
-import "dotenv/config";
-import { BigNumber, ethers } from "ethers";
+import 'dotenv/config';     // To hide secret keys in env
+import {BigNumber, ethers} from "ethers";
 
-const infuraUrl = `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`;
+// To instantiate the Infura Provider
+const infuraID = process.env.INFURA_KEY;
+const infuraUrl = 'https://mainnet.infura.io/v3/' + infuraID;
 const provider = new ethers.providers.JsonRpcProvider(infuraUrl);
+/* An alternative way
+const provider = new ethers.providers.InfuraProvider(
+    "homestead",
+    process.env.INFURA_KEY
+);
+*/
 
-// console.log("Current block number", await provider.getBlockNumber());
+console.log("Current block number", await provider.getBlockNumber());
+console.log("-----");
 
-// console.log("atg.eth is", await provider.resolveName("atg.eth"));
+const addr = await provider.resolveName("atg.eth");
+console.log("atg.eth is", addr);
+console.log("owner of", addr, "is", await provider.lookupAddress(addr));
+console.log("-----");
 
-// console.log(
-//   "0xc4ac4174aa9a93d9eef02621ce8205c75d003de5 is",
-//   await provider.lookupAddress("0xc4ac4174aa9a93d9eef02621ce8205c75d003de5")
-// );
+// ETH (Readable No) —> wei (Big No)
+console.log("1.0 ETH is", ethers.utils.parseEther("1.0").toString(), "wei (Big Number)");
 
-const vitalikBalance = await provider.getBalance("vitalik.eth");
-let sanfordBalance = await provider.getBalance("sanfordstout.eth");
+let bigNumber = BigNumber.from(100);
+const vitalikBalance = (await provider.getBalance("vitalik.eth"));
+// wei (Big No) —> ETH (Readable No)
+console.log("balance of vitalik.eth is", ethers.utils.formatEther(vitalikBalance), "ETH");       
 
-sanfordBalance = sanfordBalance.add(ethers.utils.parseEther("5000"));
-
-console.log("sanford balance", ethers.utils.formatEther(sanfordBalance));
-console.log("vitalik balance", ethers.utils.formatEther(vitalikBalance));
-
-if (vitalikBalance.gt(sanfordBalance)) {
-  console.log("Vitalik has more ETH than sanford");
+if (vitalikBalance > bigNumber) {
+    console.log("Vitalik's balance is bigger than", bigNumber.toString());
 } else {
-  console.log("Sanford has more ETH than vitalik");
+    console.log("Vitalik's balance is smaller than", bigNumber.toString());
 }
-
-// console.log("vitalik.eth has", ethers.utils.formatEther(vitalikBalance));
-//
-// console.log(
-//   "1.5 ETH is",
-//   ethers.utils.formatEther(ethers.utils.parseEther("1.5"))
-// );
+console.log("-----");

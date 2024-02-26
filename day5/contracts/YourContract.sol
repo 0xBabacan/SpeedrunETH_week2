@@ -1,41 +1,42 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+//SPDX-License-Identifier: MIT
+pragma solidity >=0.8.0 <0.9.0;
 
-//import "hardhat/console.sol";
+// Useful for debugging. Remove when deploying to a live network.
+import "hardhat/console.sol";
 
-contract SanfordToken {
-    event Buy(address indexed sender);
+// Use openzeppelin to inherit battle-tested implementations (ERC20, ERC721, etc)
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+/**
+ * A smart contract that allows changing a state variable of the contract and tracking the changes
+ * It also allows the owner to withdraw the Ether in the contract
+ * @author BuidlGuidl
+ */
+
+ // DAY4 PROJECT WITH SCAFFOLD-ETH USE
+contract YourContract is Ownable{
+	event Buy(address indexed sender);
 
     uint256 public constant totalSupply = 1000;
     uint256 public totalCreated = 0;
-
     uint256 public constant CREATION_PRICE = 0.01 ether;
     
-    address public immutable boss;
-
     mapping(address => uint256) public balances;
 
     struct Vote {
         address voter;
         bool selection;
     }
-
     Vote[] public votes;
 
-    constructor() {
-        //console.log(msg.sender);
-        boss = msg.sender;
-    }
+	// Constructor: Called once on contract deployment
+	// Check packages/hardhat/deploy/00_deploy_your_contract.ts
+	constructor() {
+		// Transfer the ownership to your address to call functions which require ownership
+		transferOwnership(0x892Bf346cef11461eEFf8CD67B7F234C8F35630F);
+	}
 
-    modifier onlyBoss() {
-        require(msg.sender == boss, "Sorry, not the boss");
-        // Underscore is a special character only used inside
-        // a function modifier and it tells Solidity to
-        // execute the rest of the code.
-        _;
-    }
-
-    function create(uint256 quantity) public onlyBoss {
+	function create(uint256 quantity) public onlyOwner {
         //console.log("--> %s   %s ", quantity, totalCreated );
         require(quantity + totalCreated <= totalSupply, "totalSupply reached!");
 
@@ -61,23 +62,13 @@ contract SanfordToken {
 
         emit Buy(msg.sender);
     }
-    /*
-    function buy(uint256 quantity) public {
-        require(quantity + totalCreated <= totalSupply, "totalSupply reached!");
 
-        balances[msg.sender] += quantity;
-        totalCreated += quantity;
-    }
-    */
     // This is the only way to withdraw ETH resides in the contract
-    function withdraw() public onlyBoss {
-        (bool sent, bytes memory data) = boss.call{value: address(this).balance}("");
+    function withdraw() public {
+        (bool sent, bytes memory data) = owner().call{value: address(this).balance}("");
         require(sent, "Failed to send Ether");
     }
 
-    // Function to receive Ether. msg.data must be empty
-    receive() external payable {}
-
-    // Fallback function is called when msg.data is not empty
-    fallback() external payable {}
+	// Function that allows the contract to receive ETH
+	receive() external payable {}
 }

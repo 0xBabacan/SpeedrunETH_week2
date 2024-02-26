@@ -1,36 +1,43 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.20;
 
 contract Counter {
-    uint256 public count;
-    address public boss;
+    uint public count;
+    address public boss; // owner is not a special keyword!
 
     constructor(uint256 _initialCount) {
         count = _initialCount;
         boss = msg.sender;
+
     }
 
     modifier onlyBoss() {
         require(msg.sender == boss, "Sorry, not the boss");
+        // Underscore is a special character only used inside
+        // a function modifier and it tells Solidity to
+        // execute the rest of the code.
         _;
     }
 
-    // Function to get the current count
     function get() public view returns (uint) {
         return count;
     }
 
-    // Function to increment count by 1
     function inc() public {
         count += 1;
     }
 
-    // Function to increment count by 1
-    function superInc() public onlyBoss {
+    function superInc() public {
         count += 10;
     }
 
-    function dec() public onlyBoss {
+    function dec() public onlyBoss{
         count -= 1;
     }
+    /* ALTERNATIVE WAY
+    function dec() public {
+        require(msg.sender == boss, "Sorry, not the boss");
+        count -= 1;
+    }
+    */
 }
